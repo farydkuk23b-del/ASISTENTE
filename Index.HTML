@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesor IA - Maestría en Monomios</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --secondary: #10b981;
+            --bg-gradient: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            --panel-bg: rgba(255, 255, 255, 0.85);
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, sans-serif; 
+        }
+        
+        body { 
+            display: flex; 
+            height: 100vh; 
+            background: var(--bg-gradient);
+            color: var(--text-dark); 
+        }
+        
+        /* Layout principal */
+        main {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 0 40px rgba(0,0,0,0.05);
+        }
+        
+        /* Contenedor Izquierdo: La Lección */
+        .lesson-panel { 
+            width: 45%; 
+            padding: 50px 40px; 
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+        
+        .badge { 
+            background: var(--secondary); 
+            color: white; 
+            padding: 6px 14px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            font-size: 12px; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        h1 { 
+            font-size: 2.2rem; 
+            margin-bottom: 25px; 
+            color: var(--primary); 
+            font-weight: 800;
+        }
+        
+        .teoria { 
+            background-color: #ffffff; 
+            padding: 25px; 
+            border-radius: 16px; 
+            margin-bottom: 30px; 
+            line-height: 1.7; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            border: 1px solid #f3f4f6;
+        }
+        
+        .teoria strong { color: var(--primary); }
+        
+        .ejemplos-box { 
+            background-color: #f8fafc; 
+            padding: 25px; 
+            border-radius: 16px; 
+            border-left: 6px solid var(--secondary); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        
+        .ejemplos-box h3 { color: var(--text-dark); margin-bottom: 15px; font-size: 1.1rem; }
+        .ejemplos-box ul { list-style: none; }
+        .ejemplos-box li { 
+            margin-bottom: 15px; 
+            font-size: 1.1rem; 
+            padding: 10px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Contenedor Derecho: Chat de IA */
+        .chat-panel { 
+            width: 55%; 
+            display: flex; 
+            flex-direction: column; 
+            background-color: #ffffff; 
+        }
+        
+        .chat-header { 
+            padding: 20px 30px; 
+            background: #ffffff; 
+            border-bottom: 1px solid #e5e7eb; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+        
+        .ia-avatar { 
+            width: 48px; height: 48px; 
+            background: var(--primary); 
+            border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: bold; color: white; font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
+        }
+
+        .header-text h2 { font-size: 1.2rem; color: var(--text-dark); }
+        .header-text p { font-size: 0.85rem; color: var(--text-light); }
+        
+        .chat-messages { 
+            flex: 1; 
+            padding: 30px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+            background: #f9fafb;
+        }
+        
+        /* Burbujas de chat */
+        .msg { 
+            max-width: 80%; 
+            padding: 18px 22px; 
+            border-radius: 18px; 
+            line-height: 1.6; 
+            font-size: 1rem; 
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(8px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .msg.ia { 
+            background: #ffffff; 
+            color: var(--text-dark);
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            border: 1px solid #f3f4f6;
+        }
+        
+        .msg.usuario { 
+            background: var(--primary); 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px; 
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
+        }
+
+        /* Controles de entrada */
+        .chat-controls {
+            background: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            padding: 20px;
+        }
+
+        .quick-actions { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+            margin-bottom: 15px;
+        }
+        
+        .btn-action { 
+            background-color: #f3f4f6; 
+            color: var(--text-dark); 
+            border: 1px solid #e5e7eb; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            font-size: 0.9rem; 
+            font-weight: 500;
+        }
+        
+        .btn-action:hover { 
+            background-color: #e0e7ff; 
+            color: var(--primary); 
+            border-color: #c7d2fe; 
+        }
+        
+        .chat-input-area { 
+            display: flex; 
+            gap: 15px; 
+        }
+        
+        input[type="text"] { 
+            flex: 1; 
+            padding: 16px 20px; 
+            background-color: #f9fafb; 
+            border: 1px solid #d1d5db; 
+            border-radius: 12px; 
+            color: var(--text-dark); 
+            outline: none; 
+            font-size: 1rem; 
+            transition: 0.2s;
+        }
+        
+        input[type="text"]:focus { 
+            border-color: var(--primary); 
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        button.send-btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 0 28px; 
+            border-radius: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.2s; 
+        }
+        
+        button.send-btn:hover { 
+            background: #4338ca; 
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 900px) {
+            main { flex-direction: column; height: auto; }
+            .lesson-panel, .chat-panel { width: 100%; border-right: none; }
+            .chat-panel { height: 70vh; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="lesson-panel">
+            <span class="badge">Unidad 1</span>
+            <h1>Anatomía del Monomio</h1>
+            
+            <div class="teoria">
+                <p>Un <strong>monomio</strong> es una expresión algebraica de un solo término. En él, los números y las letras (variables) están conectados únicamente por la multiplicación o la potenciación.<br><br>Todo monomio se compone de:<br>
+                1. <strong>Signo:</strong> Positivo (+) o negativo (-).<br>
+                2. <strong>Coeficiente:</strong> El número que multiplica a las variables.<br>
+                3. <strong>Parte literal:</strong> Las letras con sus respectivos exponentes.</p>
+            </div>
+            
+            <div class="ejemplos-box">
+                <h3>Ejemplos de nivel avanzado:</h3>
+                <ul>
+                    <li><strong>Caso 1:</strong> Fraccionario<br> \( -\frac{3}{4}x^2y^5 \)</li>
+                    <li><strong>Caso 2:</strong> Multivariable<br> \( 7a^3b c^4 \)</li>
+                    <li><strong>Caso 3:</strong> Término constante<br> \( 15 \)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="chat-panel">
+            <div class="chat-header">
+                <div class="ia-avatar">IA</div>
+                <div class="header-text">
+                    <h2>Tutor de Álgebra</h2>
+                    <p>Respondiendo dudas en tiempo real</p>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg ia">
+                    ¡Hola! Soy tu tutor matemático. 👋<br><br>Hoy estamos viendo monomios con un nivel un poco más avanzado. Puedes usar los botones abajo para analizar los casos especiales, o escribirme tus dudas directamente.
+                </div>
+            </div>
+            
+            <div class="chat-controls">
+                <div class="quick-actions">
+                    <button class="btn-action" onclick="responderEjemplo(1)">Analizar \( -\frac{3}{4}x^2y^5 \)</button>
+                    <button class="btn-action" onclick="responderEjemplo(2)">Analizar \( 7a^3b c^4 \)</button>
+                    <button class="btn-action" onclick="responderEjemplo(3)">Analizar el \( 15 \)</button>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="userInput" placeholder="Ej: ¿Cuál es el grado de un monomio?..." onkeypress="detectarEnter(event)">
+                    <button class="send-btn" onclick="enviarMensajeManual()">Enviar</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        
+        function renderizarMatematicas() {
+            renderMathInElement(chatMessages, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '\\(', right: '\\)', display: false},
+                    {left: '$', right: '$', display: false}
+                ],
+                throwOnError: false
+            });
+        }
+
+        function agregarMensaje(texto, emisor) {
+            const div = document.createElement('div');
+            div.classList.add('msg', emisor);
+            div.innerHTML = texto;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            renderizarMatematicas();
+        }
+
+        function responderEjemplo(numero) {
+            if(numero === 1) {
+                agregarMensaje("Desglosa el Caso 1: \\( -\\frac{3}{4}x^2y^5 \\)", "usuario");
+                setTimeout(() => { 
+                    agregarMensaje("¡Con gusto! En el monomio \\( -\\frac{3}{4}x^2y^5 \\):<br><br>• <strong>Signo:</strong> Negativo (-)<br>• <strong>Coeficiente:</strong> \\( \\frac{3}{4} \\)<br>• <strong>Parte literal:</strong> \\( x^2y^5 \\)<br>• <strong>Grado Absoluto:</strong> Sumamos exponentes (2 + 5) = <strong>7</strong>.", "ia"); 
+                }, 600);
+            } 
+            else if(numero === 2) {
+                agregarMensaje("Explica el Caso 2: \\( 7a^3b c^4 \\)", "usuario");
+                setTimeout(() => { 
+                    agregarMensaje("¡Interesante! En \\( 7a^3b c^4 \\):<br><br>• <strong>Coeficiente:</strong> 7<br>• <strong>Variables:</strong> \\( a, b, c \\). Nota que la \\( b \\) tiene un exponente invisible de 1.<br>• <strong>Grado Absoluto:</strong> \\( 3 + 1 + 4 \\) = <strong>8</strong>.", "ia"); 
+                }, 600);
+            } 
+            else if(numero === 3) {
+                agregarMensaje("¿Qué pasa con el Caso 3? Es solo un número: \\( 15 \\)", "usuario");
+                setTimeout(() => { 
+                    agregarMensaje("¡Excelente pregunta! Un número solo como \\( 15 \\) se considera un <strong>monomio constante</strong>.<br><br>• <strong>Coeficiente:</strong> 15<br>• <strong>Parte literal:</strong> No tiene variables visibles (es equivalente a \\( 15x^0 \\)).<br>• <strong>Grado Absoluto:</strong> <strong>0</strong>.", "ia"); 
+                }, 600);
+            }
+        }
+
+        function procesarPregunta(pregunta) {
+            let p = pregunta.toLowerCase();
+            
+            if (p.includes("dividi") || p.includes("división")) {
+                return "Para dividir, divide los coeficientes y <strong>resta</strong> los exponentes de bases iguales. <br>Ejemplo: $$ \\frac{-15x^5y^3}{3x^2y} = -5x^3y^2 $$";
+            } 
+            else if (p.includes("multiplica")) {
+                return "Para multiplicar, multiplica los coeficientes normales y <strong>suma</strong> los exponentes de las letras iguales.<br>Ejemplo: \\( (-2a^2)(4a^3) = -8a^5 \\).";
+            } 
+            else if (p.includes("suma") || p.includes("resta")) {
+                return "Solo puedes sumar/restar monomios si son <strong>semejantes</strong> (exactamente la misma parte literal).<br>Ejemplo válido: \\( 5x^2 + 3x^2 = 8x^2 \\).<br>Ejemplo inválido: \\( 5x^2 + 3x^3 \\) (se queda igual).";
+            } 
+            else if (p.includes("grado") || p.includes("exponente")) {
+                return "El <strong>grado absoluto</strong> de un monomio es la suma de todos los exponentes de sus letras. Por ejemplo, en \\( x^2y^3z \\), sumas 2+3+1 = grado 6.";
+            }
+            else if (p.includes("hola") || p.includes("saludos")) {
+                return "¡Hola! Estoy listo para aclarar tus dudas sobre álgebra. ¿Qué concepto quieres repasar?";
+            }
+            else if (p.includes("gracias")) {
+                return "¡Para eso estoy! La matemática es cuestión de práctica. ¿Alguna otra duda?";
+            }
+            else {
+                return "Esa es una buena pregunta. Mi enfoque actual es enseñarte sobre <strong>monomios y sus propiedades</strong>. Intenta preguntarme sobre grados, sumas, coeficientes o cómo multiplicar estas expresiones.";
+            }
+        }
+
+        function enviarMensajeManual() {
+            const input = document.getElementById('userInput');
+            const texto = input.value.trim();
+            
+            if(texto !== "") {
+                agregarMensaje(texto, "usuario");
+                input.value = "";
+                
+                setTimeout(() => {
+                    const respuestaIA = procesarPregunta(texto);
+                    agregarMensaje(respuestaIA, "ia");
+                }, 800);
+            }
+        }
+
+        function detectarEnter(event) {
+            if (event.key === "Enter") {
+                enviarMensajeManual();
+            }
+        }
+
+        // Renderizar ecuaciones iniciales
+        document.addEventListener("DOMContentLoaded", renderizarMatematicas);
+    </script>
+</body>
+</html>
